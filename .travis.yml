@@ -161,6 +161,19 @@ script:
     - make.cross ARCH=${a[0]} 2> ${a[0]}_err
     - cat ${a[0]}_err
 
+after_script:
+    - b=`git log -1 | grep next`
+    - mkdir push_git
+    - cd push_git
+    - git init
+    - git remote add gitw https://github.com/sudipm-mukherjee/next-warnings.git
+    - git fetch gitw
+    - git reset --hard gitw/${a[0]}_${a[1]}
+    - cp ../${a[0]}_err .
+    - git add ${a[0]}_err
+    - git -c user.name='sudip' -c user.email='sudipm.mukherjee@gmail.com' commit -m $b
+    - git push -f -q https://sudipm-mukherjee:$GITHUB_API_KEY@github.com/sudipm-mukherjee/next-warnings.git origin:${a[0]}_${a[1]} &2>/dev/null
+
 notifications:
     email:
       recipients:
