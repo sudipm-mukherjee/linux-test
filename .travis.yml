@@ -1,0 +1,27 @@
+virt: lxd
+
+language: c
+
+git:
+     depth: 1
+
+services:
+     - docker
+
+before_install:
+     - docker pull sudipm/clang:report
+     - export NR_CPU=$(cat /proc/cpuinfo | grep ^processor | wc -l)
+
+script:
+     - docker run -v "$PWD":/src --workdir /src sudipm/clang:report /bin/bash -c "./build.sh defconfig"
+
+deploy:
+      provider: pages
+      skip_cleanup: true
+      github_token: $GKEY
+      local_dir: reports_html
+      repo: sudipm-mukherjee/sudipm-mukherjee.github.io
+      verbose: true
+      target_branch: master
+      on:
+        branch: linux
