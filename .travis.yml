@@ -1,0 +1,15 @@
+virt: lxd
+
+language: c
+
+git:
+     depth: 1
+
+script:
+     - touch smatch_warns.txt
+
+addons:
+     artifacts:
+       paths: smatch_warns.txt
+       target_paths:
+       - /
