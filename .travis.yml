@@ -6,11 +6,11 @@ git:
      depth: 1
 
 script:
-     - touch smatch_warns.txt
+     - echo "abcd" > smatch_warns.txt
 
 addons:
      artifacts:
        paths: smatch_warns.txt
-       target_paths: /
+       target_paths: /log
        s3_region: "eu-west-2"
-       
+       debug: true
