@@ -11,5 +11,6 @@ script:
 addons:
      artifacts:
        paths: smatch_warns.txt
-       target_paths:
-       - /
+       target_paths: /
+       s3_region: "eu-west-2"
+       
