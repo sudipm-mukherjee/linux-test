@@ -12,5 +12,4 @@ addons:
      artifacts:
        paths: smatch_warns.txt
        target_paths: /log
-       s3_region: "eu-west-2"
        debug: true
