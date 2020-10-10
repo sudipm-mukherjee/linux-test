@@ -29,7 +29,7 @@ jobs:
        - docker pull sudipm/smatch
       script:
         - cp ~/backup/backup.tar.bz2 .  || true
-        - docker run -v "$PWD":/src --workdir /src sudipm/smatch /bin/bash -c "./build smatch tinyconfig"
+        - docker run -v "$PWD":/src --workdir /src sudipm/smatch /bin/bash -c "./build.sh smatch tinyconfig"
         - cp backup.tar.bz2 ~/backup/.
         - cp smatch_warns.txt ~/backup/cache/.
 
