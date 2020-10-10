@@ -21,24 +21,24 @@ jobs:
       before_install:
        - docker pull sudipm/clang:report
       script:
-        docker run -v "$PWD":/src --workdir /src sudipm/clang:report /bin/bash -c "./build.sh clang tinyconfig"
-        cp clang_log ~/backup/cache/.
+        - docker run -v "$PWD":/src --workdir /src sudipm/clang:report /bin/bash -c "./build.sh clang tinyconfig"
+        - cp clang_log ~/backup/cache/.
 
     - stage: build
       before_install:
        - docker pull sudipm/smatch
       script:
-        cp ~/backup/backup.tar.bz2 .  || true
-        docker run -v "$PWD":/src --workdir /src sudipm/smatch /bin/bash -c "./build smatch tinyconfig"
-        cp backup.tar.bz2 ~/backup/.
-        cp smatch_warns.txt ~/backup/cache/.
+        - cp ~/backup/backup.tar.bz2 .  || true
+        - docker run -v "$PWD":/src --workdir /src sudipm/smatch /bin/bash -c "./build smatch tinyconfig"
+        - cp backup.tar.bz2 ~/backup/.
+        - cp smatch_warns.txt ~/backup/cache/.
 
     - stage: report
       before_install:
        - docker pull sudipm/clang:report
       script:
-        cp ~/backup/cache/* .  || true
-        docker run -v "$PWD":/src --workdir /src sudipm/clang:report /bin/bash -c "./build.sh report"
+        - cp ~/backup/cache/* .  || true
+        - docker run -v "$PWD":/src --workdir /src sudipm/clang:report /bin/bash -c "./build.sh report"
       deploy:
         provider: pages
         skip_cleanup: true
