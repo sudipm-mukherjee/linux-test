@@ -18,14 +18,14 @@ services:
 jobs:
   include:
     - stage: build
-      before_install:
+      before_script:
        - docker pull sudipm/clang:report
       script:
         - docker run -v "$PWD":/src --workdir /src sudipm/clang:report /bin/bash -c "./build.sh clang tinyconfig"
         - cp clang_log ~/backup/cache/.
 
     - stage: build
-      before_install:
+      before_script:
        - docker pull sudipm/smatch
       script:
         - cp ~/backup/backup.tar.bz2 .  || true
@@ -34,7 +34,7 @@ jobs:
         - cp smatch_warns.txt ~/backup/cache/.
 
     - stage: report
-      before_install:
+      before_script:
        - docker pull sudipm/clang:report
       script:
         - cp ~/backup/cache/* .  || true
