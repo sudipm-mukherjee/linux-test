@@ -9,19 +9,7 @@ services:
      - docker
 
 before_install:
-     - docker pull sudipm/clang:report
-     - export NR_CPU=$(cat /proc/cpuinfo | grep ^processor | wc -l)
+     - docker pull sudipm/smatch
 
 script:
-     - docker run -v "$PWD":/src --workdir /src sudipm/clang:report /bin/bash -c "./build.sh defconfig"
-
-deploy:
-      provider: pages
-      skip_cleanup: true
-      github_token: $GKEY
-      local_dir: reports_html
-      repo: sudipm-mukherjee/sudipm-mukherjee.github.io
-      verbose: true
-      target_branch: master
-      on:
-        branch: linux
+     - docker run -v "$PWD":/src --workdir /src sudipm/smatch /bin/bash -c "./build_smatch.sh defconfig"
