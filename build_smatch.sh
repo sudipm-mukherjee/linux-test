@@ -9,5 +9,6 @@ make olddefconfig
 mkdir backup
 cp smatch_db.sqlite backup/.
 cp -r /smatch/smatch_data backup/.
-tar -cjvf backup.tar.bz2 backup
-ls -lh backup.tar.bz2
+tar -cjvf ./backup.tar.bz2 backup
+ls -l
+ls -l ./backup.tar.bz2
