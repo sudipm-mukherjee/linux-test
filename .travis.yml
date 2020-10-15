@@ -1,6 +1,11 @@
 virt: lxd
 dist: focal
 language: c
+sudo: required
+addons:
+  apt:
+    packages:
+      - apparmor
 
 git:
      depth: 1
@@ -11,6 +16,10 @@ before_install:
      - pip install awscli
      - mkdir -p ~/backup/cache
      - aws s3 sync s3://elisa.kernel.test/backup ~/backup
+     - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+     - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+     - sudo apt-get update
+     - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce     
 
 services:
      - docker
