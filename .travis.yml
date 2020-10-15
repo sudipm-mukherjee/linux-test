@@ -2,10 +2,6 @@ virt: lxd
 dist: focal
 language: c
 sudo: required
-addons:
-  apt:
-    packages:
-      - apparmor
 
 git:
      depth: 1
@@ -16,10 +12,6 @@ before_install:
      - pip install awscli
      - mkdir -p ~/backup/cache
      - aws s3 sync s3://elisa.kernel.test/backup ~/backup
-     - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-     - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-     - sudo apt-get update
-     - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce     
 
 services:
      - docker
@@ -30,6 +22,8 @@ jobs:
       before_script:
        - docker pull sudipm/clang:report
       script:
+        - sudo find /etc/apparmor.d/docker
+        - sudo cat /etc/apparmor.d/docker
         - docker run -v "$PWD":/src --workdir /src sudipm/clang:report /bin/bash -c "./build.sh clang defconfig"
         - cp clang_log.tar.bz2 ~/backup/cache/.
 
@@ -38,7 +32,7 @@ jobs:
        - docker pull sudipm/smatch
       script:
         - wget https://gitlab.com/sudipm/smatchdb/-/raw/master/backup.tar.bz2
-        - docker run -v "$PWD":/src --workdir /src sudipm/smatch /bin/bash -c "./build.sh smatch defconfig"
+        - docker run -v "$PWD":/src --workdir /src --security-opt apparmor=docker-default sudipm/smatch /bin/bash -c "./build.sh smatch defconfig"
         - cp smatch_warns.txt.tar.bz2 ~/backup/cache/.
 
     - stage: build
