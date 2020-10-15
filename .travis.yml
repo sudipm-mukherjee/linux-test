@@ -1,0 +1,106 @@
+virt: lxd
+
+language: c
+
+git:
+     depth: 1
+
+before_install:
+     - pyenv global 3.7.1
+     - pip install -U pip
+     - pip install awscli
+     - mkdir -p ~/backup/cache
+     - aws s3 sync s3://elisa.kernel.test/backup ~/backup
+
+services:
+     - docker
+
+jobs:
+  include:
+    - stage: build
+      before_script:
+       - docker pull sudipm/clang:report
+      script:
+        - docker run -v "$PWD":/src --workdir /src sudipm/clang:report /bin/bash -c "./build.sh clang defconfig"
+        - cp clang_log.tar.bz2 ~/backup/cache/.
+
+    - stage: build
+      before_script:
+       - docker pull sudipm/smatch
+      script:
+        - wget https://gitlab.com/sudipm/smatchdb/-/raw/master/backup.tar.bz2
+        - docker run -v "$PWD":/src --workdir /src sudipm/smatch /bin/bash -c "./build.sh smatch defconfig"
+        - cp smatch_warns.txt.tar.bz2 ~/backup/cache/.
+
+    - stage: build
+      before_script:
+       - docker pull sudipm/cocci
+      script:
+        - docker run -v "$PWD":/src --workdir /src sudipm/cocci /bin/bash -c "./build.sh cocci1"
+        - cp cocci_err1.tar.bz2 ~/backup/cache/.
+
+    - stage: build
+      before_script:
+       - docker pull sudipm/cocci
+      script:
+        - docker run -v "$PWD":/src --workdir /src sudipm/cocci /bin/bash -c "./build.sh cocci2"
+        - cp cocci_err2.tar.bz2 ~/backup/cache/.
+
+    - stage: build
+      before_script:
+       - docker pull sudipm/cocci
+      script:
+        - docker run -v "$PWD":/src --workdir /src sudipm/cocci /bin/bash -c "./build.sh cocci3"
+        - cp cocci_err3.tar.bz2 ~/backup/cache/.
+
+    - stage: build
+      before_script:
+       - docker pull sudipm/cocci
+      script:
+        - docker run -v "$PWD":/src --workdir /src sudipm/cocci /bin/bash -c "./build.sh cocci4"
+        - cp cocci_err4.tar.bz2 ~/backup/cache/.
+
+    - stage: build
+      before_script:
+       - docker pull sudipm/cocci
+      script:
+        - docker run -v "$PWD":/src --workdir /src sudipm/cocci /bin/bash -c "./build.sh cocci5"
+        - cp cocci_err5.tar.bz2 ~/backup/cache/.
+
+    - stage: report
+      before_script:
+       - docker pull sudipm/clang:smatch
+      script:
+        - cp ~/backup/cache/* .
+        - docker run -v "$PWD":/src --workdir /src sudipm/clang:smatch /bin/bash -c "./build.sh report"
+      deploy:
+        provider: pages
+        skip_cleanup: true
+        github_token: $GKEY
+        local_dir: reports_html
+        repo: sudipm-mukherjee/sudipm-mukherjee.github.io
+        verbose: true
+        target_branch: master
+        on:
+          branch: linux
+      after_success:
+        - aws s3 rm --recursive s3://elisa.kernel.test/backup/cache
+
+    - stage: builddb
+      before_script:
+       - docker pull sudipm/smatch
+      script:
+        - oldpwd=`pwd`
+        - cd $HOME
+        - git clone https://oauth2:$GL@gitlab.com/sudipm/smatchdb.git
+        - cd $oldpwd
+        - cp $HOME/smatchdb/backup.tar.bz2 .  || true
+        - docker run -v "$PWD":/src --workdir /src sudipm/smatch /bin/bash -c "./build.sh smatchdb defconfig"
+        - cp backup.tar.bz2 $HOME/smatchdb/.
+        - cd $HOME/smatchdb
+        - git add -f backup.tar.bz2
+        - git commit -s -m "smatch db update"
+        - git push -v origin
+
+after_success:
+  - aws s3 sync ~/backup s3://elisa.kernel.test/backup
