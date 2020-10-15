@@ -22,14 +22,9 @@ jobs:
       before_script:
        - docker pull sudipm/clang:report
       script:
-        - sudo find /etc/apparmor.d/docker
-        - sudo cat /etc/apparmor.d/docker
-        - sudo touch /etc/apparmor.d/docker
         - docker --version
         - sudo aa-status
-        - sudo systemctl stop apparmor
-        - sudo systemctl disable apparmor
-        - docker run -v "$PWD":/src --workdir /src sudipm/clang:report /bin/bash -c "./build.sh clang defconfig"
+        - sudo docker run -v "$PWD":/src --workdir /src sudipm/clang:report /bin/bash -c "./build.sh clang defconfig"
         - cp clang_log.tar.bz2 ~/backup/cache/.
 
     - stage: build
