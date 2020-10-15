@@ -1,4 +1,4 @@
-virt: lxd
+dist: bionic
 
 language: c
 
