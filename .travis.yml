@@ -1,0 +1,21 @@
+dist: bionic
+
+language: c
+
+git:
+     depth: 1
+
+arch:
+  - amd64
+  - arm64
+  - ppc64le
+  - s390x
+
+compiler:
+  - gcc
+
+script:
+  - make allmodconfig
+  - NR_CPU=$(cat /proc/cpuinfo | grep ^processor | wc -l)
+  - echo ${NR_CPU}
+  - make -j${NR_CPU}
